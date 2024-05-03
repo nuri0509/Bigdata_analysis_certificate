@@ -1,0 +1,99 @@
+<<빅데이터 분석기사 실기 정리>>
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+##(데이터분석과정)
+
+필요패키지 임포트 > 데이터불러오기 > 데이터 살펴보기 > 데이터 전처리 > 분석데이터셋 준비 > 데이터 분석 수행 > 성능 평가 및 시각화
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+##주요 명령어
+
+(1)  필요패키지 임포트
+
+print(sklearn.__version__)      #사이킷런 버전확인
+
+import numpy as np       #넘파이 불러오기
+import pandas as pd      #판다스 불러오기
+import sklearn              #사이킷런 불러오기
+
+from sklearn.tree import DecisionTreeClassifier         #의사결정나무 분류모델을 위한 패키지 임포트
+  
+from sklearn.model_selection import train_test_split     #학습 및 테스트 데이터셋 분리를 위한 패키지 임포트
+
+
+
+(2) 데이터 불러오기
+
+df = pd.read_csv("https://raw.git~~~~/dataset/main/iris/csv")      #깃허브에있는 csv파일을 읽어와서 데이터프레임 df로 넣는다
+
+
+
+(3) 데이터 살펴보기
+
+df                   #데이터프레임 전체 출력
+df.head()          #데이터 앞부분 출력
+df.shape           #데이터 열과행 갯수 출력
+df.info()           #데이터 요약정보 출력
+df.describe()     #데이터 프레임의 기술통계 보여주기
+
+
+
+(4) 데이터 전처리
+-이상치, 결측치 판단 
+-데이터인코딩, 단위환산, 자료형 변환, 정규화, 파생변수 생성 등의 작업
+
+df['species'].replace({'setosa':0 , 'versicolor':1 , 'virginica':2}, inplace=True)    #텍스트로 되어있는  species컬럼의 데이터를 0,1,2로 변환한다
+df
+
+
+
+
+(5)분석 데이터셋 준비
+-전처리를 마친 데이터를 학습용,테스트용 데이터 셋으로 분리한다.(일반적으로 8:2의 비율로 분리)
+
+X = df[["sepal_length", "sepal_width",  "petal_length", "petal_width"]]    #X는 독립변수
+y = df[["species"]]                                                                         #y는 종속변수
+
+X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.2, random_state=11)
+
+
+
+-shape 속성을 이용하여 결과 데이터셋의 크기 확인하기
+print(X_train.shape)
+print(X_test.shape)
+print(y_train.shape)
+print(y_test.shape)
+
+
+
+(6)데이터 분석 수행
+-분석알고리즘을 선택하고, 분석을 수행한다
+-분석문제는 크게 지도학습( 분류 - 의사결정나무,KNN, SVM, 로지스틱 회귀분석,랜덤포레스트,인공신경망 등 )과,
+                         지도학습( 회귀 - 선형회귀분석, 다중회귀분석, 의사결정나무 )와
+                        비지도학습(군집분석,연관분석, 인공신경망 등)으로 나뉜다
+
+##분석 예시
+
+dt = DecisionTreeClassifier(random_state=11)
+dt.fit(X_train, y_train)
+
+pred = dt.predict(X_test)
+
+
+##모델성능 - 정확도 측정
+from sklearn.metrics import accuracy_score
+acc = accuracy_score(y_test, pred)
+print(acc)
+
+
+
+
+
+
+
+
+
