@@ -1,0 +1,101 @@
+append()
+count()
+replace(0, A) =>0을 A로 바꿈(예시)
+split()
+
+series1 = pd.Series([ , , , , , ]) 
+df1 = pd.DataFrame([[ , , , ],[ , , , ]])  =>리스트를 이용한 방법
+dic1 = {'fruit' : [ , , , , , ],
+          'price' : [ , , , , , ],
+          'qty' : [ , , , , , ]}
+df1 = pd.DataFrame(dic1)     =>딕셔너리를 이용한 방법
+print(df1)
+
+데이터 프레임 기술통계 =>describe()
+데이터 프레임 기본 정보 =>info()
+행과 열의 개수=>shape
+df["  "].value_counts()  ==> df1["퀴즈"].value_counts()  
+df1[['중간', '기말']].corr()
+drop() ==>    df3 =df2.drop('퀴즈', axis=1) (행제거면 axis 안써도됨)
+set_index()  ==> df1.set_index('학번' , inplace=True)
+sort_index()  ==> df1.sort_index(ascending = False)
+
+sort_values() ==>df1.sort_values(by ='기말', ascending=True)
+
+std() : 표준편차
+var() : 분산
+
+
+
+np.random.rand(n)
+np.random.randint(min, max. size = n)
+np.random.randn(n)
+
+df["Survived"].astype(str)  ==> df데이터의 생존열을 문자열로 변환
+dtype() 변수타입확인
+df.groupby("Survived")
+
+data_0 = df[df["Survived"]=="0"]["Fare"]
+data_1 = df[df["Survived"]=="1"]["Fare"]
+
+z-표준화 
+
+z = (x - mean(x)) / np.std(x)
+sklearn.preprocessing -> StandardScaler().fit_transform([["해당칼럼"]])    <==리스트로 두번감싸야 값에 접근할수있다
+단,train_data set에는 fit_transform()
+validation, test_data set에는 transform()
+
+min-max 정규화
+
+min = np.min(df["해당칼럼"])
+max =np.max(df["해당칼럼"])
+df["새열추가"] =   (df["해당칼럼"] - min)  /  (max- min)
+sklearn.preprocessing -> MinMaxdScaler().fit_transform([["해당칼럼"]])     <==리스트로 두번감싸야 값에 접근할수있다
+
+왜도- scipy.skew()   ==> print(scipy.skew(df["해당칼럼"]))
+
+첨도-scipy.kurt     ==>
+
+log(x)  밑이  e인 로그
+log10(x) 밑이 10인 로그
+
+변수 스케일링 후에 =>>>>주성분분석(pca)
+
+from sklearn.decomposition import PCA
+pca = PCA(n_components=4)
+p_score = pca.fit_trasform(df)
+print(p_score.shape)
+print(pca.explained_variance_ratio_)
+
+=>출력결과
+[0.7336363525   0.2347483837    0.03343455    0.00517871]   총변수 두개로 96%설명가능 (두개로 변수선택)
+  
+
+isnull().sum()
+dropna()      결측치가 있는 모든 행,열 삭제  => df.dropna(axis =0 or 1  )
+                  해당열의 결측치가 있는 모든행 삭제 =>df.dropna(subset=['    '], axis =0)
+
+scipy.mode    =>   mode = df["해당칼럼"].mode()
+                          df["해당칼럼"].fillna(mode, inplace=True)
+                          print(df["해당칼럼"].isnull(),sum())
+fillna(method='ffill')  결측치행의 직전행값으로 대체
+fillna(method='bfill')   결측치행의 다음행값으로 대체
+
+
+이상치 처리(Outlier) - IQR방법
+
+3분위수 : percentile(.75)
+1분위수 : percentile(.25)
+
+IQR = 3분위수-1분위수
+
+Outlier는   (3분위수 + IQR*1.5) 보다 큰 값이거나,     (1분위수  - IQR*1.5) 보다 작은값으로 검출한다
+
+
+(이상치 검출 예시코드)
+Q1,Q3 = np.percentile(df, [25, 75])
+IQR = Q3 - Q1
+
+outlier = df[(Q1-1.5*IQR > df) | (Q3+1.5*IQR <df )]
+print(outlier)
+

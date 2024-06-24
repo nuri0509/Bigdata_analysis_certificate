@@ -1,0 +1,168 @@
+<제1장>가설검정 기법 소개
+-카이제곱 검정, 회귀분석(로지스틱 회귀, 선형회귀), T검정, F검정 등이 있다
+
+카이제곱 검정방법:
+적합도 검정 : 표본집단의 분포가 주어진 기준의 특정분포를 잘따르고 있는지
+독립성 검정 : 각 범주가 서로 독립적인지, 연관성이 있는지
+동질성 검정 : 하나의 범주형 변수를 기준으로 각 그룹이 서로 비슷한지(확률분포가 동일한지)
+
+회귀분석: 하나이상의 독립변수가 종속변수에 끼치는 영향을 분석하는 통계 기법
+
+회귀분석의 가정:
+선형성
+독립성
+등분산성
+정상성(정규성)
+
+회귀분석의 검정방법
+
+단순선형회귀  :  회귀계수 검정, 결정계수(R^2) 활용등
+
+다중선형회귀  :  회귀계수 검정, F-통계량을 활용한 통계적 유의성 검정, 결정계수(R^2) 활용, 분산팽창지수(VIF)활용 등이있다
+
+T검정(T-test) : 모집단의 분산이나 표준편차를 알지못할때, 표본으로 추정된 분산,표준편차를 이용하여
+                    두모집단의 평균차이를 알아보는 검정방법
+                   -표본이 정규성, 등분산성, 독립성을 만족할떄 사용가능
+
+단일표본T검정(stats.ttest_1samp()) : 하나로 구성된 모집단의 평균값을 기준값과 비교할때 사용하는 방법
+
+대응표본T검정(stats.ttest_1samp()) : 동일한 표본의 A시점과 B시점을 비교할 때 사용하는 방법
+
+독립표본T검정(stats.ttest_1samp()) : 독립된 두 집단의 평균 차이를 검정하는 분석 방법
+
+
+F검정(F-test) :  두 모집단의 분산의 차이가 있는지 검정하는 방법
+                     F값이 클수록 두 집단간의 분산 차이가 존재한다고 가정
+                     - (F검정으로 등분산여부 검정 가능)
+
+                     귀무가설(H0) : 모집단간의 분산이 같다.
+                     대립가설(H1) : 모집단간의 분산이 다르다.
+
+
+
+---------------------------------------------------------------------------------
+<제2장>가설 검정 실습
+
+#카이제곱 검정(독립성,동질성) 
+ -데이터를 table로 만들기( pd.crosstab )
+ ***chi2_contingency
+chi , p_val , dof, exp : (카이제곱 통계량, p_value, 자유도, 기댓값) 
+
+
+#카이제곱 검정(적합도)
+-관측빈도 데이터를 배열로 만들기
+-기대빈도 데이터를 배열로 만들기
+ ***chisquare
+chi2, p_val : (카이제곱 통계량, p_value)
+
+
+
+<동질성 검정의 예시> - chi2_contingency---------------------------
+
+purchse = pd.DataFrame({'purchase' : [   ,  ,  ,  ]},
+                                  index=[  ,  ,  ,  ])
+non_purchase = pd.DataFrame({'non_purchase' : [   ,  ,  ,  ]},
+                                  index=[  ,  ,  ,  ])
+df = pd.concat([purchase, non_purchase], axis=1)
+print(df)
+
+from scipy.stats import chi2_contingency
+
+chi2, p_val, dof, exp = chi2_contingency(df)
+print( '카이제곱 통계량:' , chi2)
+print( 'p-value:' , p-val)
+
+<적합도 검정의 예시> - chi2_square -----------------------------------
+
+real_data = [  ,  ,  ,  ,  ]  
+exp = int   (sum(real_data) / len(real_data))     # len(real_data)=5
+print(exp)  # 기댓값 출력  
+=>(x ,x ,x ,x ,x)  
+
+expeted = [ x ,x ,x ,x ,x ]        
+
+from scipy.stats import chisquare
+chi, p_val = chisquare(real_data, expected)
+print('카이제곱 통계량:' chi)
+print('p-val:', p_val)   
+
+
+<로지스틱 회귀 분석의 예시(매뉴얼)> - statsmodels.logit  -------------------------------------------------
+
+from statsmodels.formula.api import logit
+
+result = logit( ' Y변수명 ~ X변수명1 + X변수명2 + X변수명3 , data = df.fit.summary()
+print(result)
+
+(로지스틱 회귀분석 결과표에 대한 해석)
+
+Dep.Variable 종속변수
+No.Observations   총 표본의 수
+Df Residuls   (잔차의 자유도 = 표본수 = 종속변수 개수 - 독립변수 개수)
+Df Model   독립변수 개수
+Pseudo R-Squ  로지스틱 회귀모형의 성능(0~1의 범위로 1에 가까울수록 성능이 좋음)
+Intercept 회귀식의 절편
+coef  로지스틱 회귀계수
+P>|z|  p_value( 0.05보다 작아야 해당 모델이 유의미하다고 판정 )
+
+
+<선형 회귀 분석의 예시(매뉴얼)> - statsmodels.OLS  -------------------------------------------------
+
+import statsmodels.api as sm
+
+X = sm.add_constant(df[[ 'X1', 'X2', 'X3'  ]])
+model = sm.OLS(df[' Y변수명 ' ], X)
+result = model.fit()
+
+print(result.summary())
+print(round(result.params[' '], 3))  #   ' '의 회귀계수 
+
+
+<T검정>----------------------------------------------
+
+(예시설명): 당뇨약 복용전과 후의 혈당 데이터가 주어진 상태에서
+->당뇨약의 치료 효과가 있는지 대응(쌍체)표본 T-검정을 수행한다. 
+
+귀무가설(H0) : 당뇨약 복용전과 후의 혈당 차이가 없다 ( u >=0 )
+대립가설(H1) : 당뇨약 복용전과 후의 혈당 차이가 있다 (u < 0)
+          ( u : 약 복용 후 - 약 복용전 혈당의 평균 )
+
+예를 들어, 약 복용 후 수치가 낮고, 약 복용 전 수치가 높으면 => '약 효과가 있다'
+   이 경우, 평균(u)의 값이 음수가 된다
+ 
+반면, 약 복용 후 수치가 높고, 약 복용 전 수치가 낮으면 => '약 효과 없다'
+   이 경우, 평균(u)의 값이 0 or 양수가 된다
+
+
+(T검정 코드예시) 
+
+before = pd.DataFrame({'before':[ , , , , , , , , ]},
+             index = [ , , , , , , , ,])
+
+
+after  =    pd.DataFrame({({'after':[ , , , , , , , , ]},
+             index = [ , , , , , , , ,])
+
+df = pd.concat([before, after], axis=1)
+print(df)
+
+from scipy import stats
+stats,ttest_rel(df['after'], df['before'], alternative = 'less')
+print( 't-통계량:', t_stats )
+print('p-value:', p_val)
+
+<F검정>-scipy.stats.f_oneway     ----------------------------------------------
+
+F검정은 두 모집단간의 분산차이가 있느지를 검정하는 방법
+F통계량이 클수록 두 집단간의 분산차이가 존재하는것을 의미한다
+
+#자동차 판매 데이터 생성
+car_store1 = [ , , , , , , , , , , , , , , , ,] 
+car_store2 = [ , , , , , , , , , , , , , , , ,] 
+
+from scipy.stats import f_oneway
+
+f_stats, p_val = f_oneway( car_store1, car_store2 )
+print( 'f-통계량:', round(f_stats, 3 )
+print( 'p_value:', p_val)
+
